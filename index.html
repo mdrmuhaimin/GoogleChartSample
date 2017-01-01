@@ -5,7 +5,7 @@
         //setInterval(drawChart, 5000);
         //google.charts.setOnLoadCallback(setInterval(drawChart, 1000));
         var header = ['Time', '211', '212', '213', '214', '215', '216' ];
-        var graphLength = 120;
+        var graphLength = 6;
         var getNewDataSet = function () {
             var _211 = Math.floor(Math.random() * 20) + 20;
             var _212 = Math.floor(Math.random() * 20) + 30;
@@ -28,7 +28,7 @@
             }
             return data;
         };
-        var dataSet = createDataSet();
+        var initData = [header].concat(createDataSet());
         var getData = function (init) {
             if(typeof init === 'undefined' || init === false) {
                 dataSet.shift();
@@ -39,6 +39,7 @@
         };
         var drawChart = function() {
             var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            var dataSet = google.visualization.arrayToDataTable(initData, false);
             var options = {
                 title: 'Company Performance',
                 curveType: 'function',
@@ -54,12 +55,15 @@
                 function() {
                     console.log("Hello");
                     setTimeout(function () {
-                        chart.draw(getData(), options)
+                        dataSet.removeRow(0);
+                        console.log(getNewDataSet());
+                        dataSet.addRow(getNewDataSet());
+                        chart.draw(dataSet, options)
                     }, 1000)
                 });
 
-            chart.draw(getData(), options);
-        }
+            chart.draw(dataSet, options);
+        };
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart);
     </script>
