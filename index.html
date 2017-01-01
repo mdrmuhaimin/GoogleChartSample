@@ -1,0 +1,70 @@
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        //setInterval(drawChart, 5000);
+        //google.charts.setOnLoadCallback(setInterval(drawChart, 1000));
+        var header = ['Time', '211', '212', '213', '214', '215', '216' ];
+        var graphLength = 120;
+        var getNewDataSet = function () {
+            var _211 = Math.floor(Math.random() * 20) + 20;
+            var _212 = Math.floor(Math.random() * 20) + 30;
+            var _213 = Math.floor(Math.random() * 20) + 40;
+            var _214 = Math.floor(Math.random() * 20) + 50;
+            var _215 = Math.floor(Math.random() * 20) + 60;
+            var _216 = Math.floor(Math.random() * 20) + 70;
+            var date = new Date();
+            var time = date.getHours() + ' : ' +  date.getMinutes() + ' : ' + date.getSeconds();
+            if( new Date().getSeconds() % 15 === 0) {
+                return [date.getMinutes() + ':' + date.getSeconds(), _211, _212, _213, _214, _215, _216];
+            }
+            return [date.getMinutes() + ':' + date.getSeconds(), _211, _212, _213, _214, _215, _216];
+        };
+        var createDataSet = function () {
+            var data = [];
+            for (var i = 0; i < graphLength; i++) {
+                var dataSet = getNewDataSet();
+                data.push(getNewDataSet());
+            }
+            return data;
+        };
+        var dataSet = createDataSet();
+        var getData = function (init) {
+            if(typeof init === 'undefined' || init === false) {
+                dataSet.shift();
+                dataSet.push(getNewDataSet());
+            }
+            console.log(dataSet);
+            return google.visualization.arrayToDataTable([header].concat(dataSet));
+        };
+        var drawChart = function() {
+            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            var options = {
+                title: 'Company Performance',
+                curveType: 'function',
+                legend: { position: 'bottom' },
+                animation:{
+                    //startup: true,
+                    duration: 700,
+                    easing: 'linear'
+                }
+            };
+
+            google.visualization.events.addListener(chart, 'ready',
+                function() {
+                    console.log("Hello");
+                    setTimeout(function () {
+                        chart.draw(getData(), options)
+                    }, 1000)
+                });
+
+            chart.draw(getData(), options);
+        }
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+    </script>
+</head>
+<body>
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+</body>
+</html>
