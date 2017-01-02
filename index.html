@@ -2,73 +2,108 @@
 <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        //setInterval(drawChart, 5000);
-        //google.charts.setOnLoadCallback(setInterval(drawChart, 1000));
-        var header = ['Time', '211', '212', '213', '214', '215', '216' ];
         var graphLength = 6;
-        var getNewDataSet = function () {
+        var graphDist = 15;
+        var hAxisTicks = [];
+        var getNewDataSet = function (timeEpoch) {
             var _211 = Math.floor(Math.random() * 20) + 20;
             var _212 = Math.floor(Math.random() * 20) + 30;
             var _213 = Math.floor(Math.random() * 20) + 40;
             var _214 = Math.floor(Math.random() * 20) + 50;
             var _215 = Math.floor(Math.random() * 20) + 60;
             var _216 = Math.floor(Math.random() * 20) + 70;
-            var date = new Date();
-            var time = date.getHours() + ' : ' +  date.getMinutes() + ' : ' + date.getSeconds();
-            if( new Date().getSeconds() % 15 === 0) {
-                return [date.getMinutes() + ':' + date.getSeconds(), _211, _212, _213, _214, _215, _216];
+            var date;
+            var time;
+            if(typeof timeEpoch === 'undefined') {
+                date  = new Date();
+            } else {
+                date  = new Date(timeEpoch);
             }
-            return [date.getMinutes() + ':' + date.getSeconds(), _211, _212, _213, _214, _215, _216];
+            time = [date.getHours(), date.getMinutes(), date.getSeconds()];
+            //console.log(time);
+            if( date.getSeconds() % graphDist === 0) {
+                if(hAxisTicks.length > graphLength / graphDist) {
+                    hAxisTicks.shift();
+                }
+                hAxisTicks.push(time);
+                return [time, _211, _212, _213, _214, _215, _216];
+            }
+            return [time, _211, _212, _213, _214, _215, _216];
         };
         var createDataSet = function () {
             var data = [];
-            for (var i = 0; i < graphLength; i++) {
-                var dataSet = getNewDataSet();
-                data.push(getNewDataSet());
+            var epochTime = new Date().getTime() - (graphLength * 1000) + 1000;
+            for (var i = 0; i < graphLength; i++, epochTime += 1000) {
+                var dataSet = getNewDataSet(epochTime);
+                data.push(dataSet);
             }
             return data;
         };
-        var initData = [header].concat(createDataSet());
-        var getData = function (init) {
-            if(typeof init === 'undefined' || init === false) {
-                dataSet.shift();
-                dataSet.push(getNewDataSet());
-            }
-            console.log(dataSet);
-            return google.visualization.arrayToDataTable([header].concat(dataSet));
-        };
+
         var drawChart = function() {
             var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-            var dataSet = google.visualization.arrayToDataTable(initData, false);
-            var options = {
-                title: 'Company Performance',
-                curveType: 'function',
-                legend: { position: 'bottom' },
-                animation:{
-                    //startup: true,
-                    duration: 700,
-                    easing: 'linear'
+            var data = new google.visualization.DataTable();
+            data.addColumn('timeofday', 'Time');
+            data.addColumn('number', '211');
+            data.addColumn('number', '212');
+            data.addColumn('number', '213');
+            data.addColumn('number', '214');
+            data.addColumn('number', '215');
+            data.addColumn('number', '216');
+            data.addRows(createDataSet());
+            var getOptions = function (){
+                return {
+                    title: 'Company Performance',
+                    curveType: 'function',
+                    //hAxis: { ticks: hAxisTicks },
+                    legend: { position: 'bottom' },
+                    animation:{
+                        //startup: true,
+                        duration: 1500,
+                        easing: 'linear'
+                    }
                 }
+
             };
 
             google.visualization.events.addListener(chart, 'ready',
                 function() {
-                    console.log("Hello");
                     setTimeout(function () {
-                        dataSet.removeRow(0);
-                        console.log(getNewDataSet());
-                        dataSet.addRow(getNewDataSet());
-                        chart.draw(dataSet, options)
-                    }, 1000)
+                        var dataSet = getNewDataSet();
+                        data.removeRow(0);
+                        data.addRows([dataSet]);
+                        console.log(data.getNumberOfRows());
+                        console.log(JSON.parse(data.toJSON()));
+                        chart.draw(data, {
+                            title: 'Company Performance',
+                            curveType: 'function',
+                            //hAxis: { ticks: hAxisTicks },
+                            legend: { position: 'bottom' },
+                            animation:{
+                                //startup: true,
+                                duration: 1500,
+                                easing: 'linear'
+                            }
+                        });
+                     }, 3000)
                 });
-
-            chart.draw(dataSet, options);
+            chart.draw(data, {
+                title: 'Company Performance',
+                curveType: 'function',
+                //hAxis: { ticks: hAxisTicks },
+                legend: { position: 'bottom' },
+                animation:{
+                    //startup: true,
+                    duration: 1500,
+                    easing: 'linear'
+                }
+            });
         };
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart);
     </script>
 </head>
 <body>
-    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+    <div id="curve_chart" style="height: 500px"></div>
 </body>
 </html>
