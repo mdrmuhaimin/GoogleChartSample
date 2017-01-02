@@ -2,7 +2,7 @@
 <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        var graphLength = 6;
+        var graphLength = 120;
         var graphDist = 15;
         var hAxisTicks = [];
         var getNewDataSet = function (timeEpoch) {
@@ -19,7 +19,8 @@
             } else {
                 date  = new Date(timeEpoch);
             }
-            time = [date.getHours(), date.getMinutes(), date.getSeconds()];
+            //time = [date.getHours(), date.getMinutes(), date.getSeconds()];
+            time = date.getMinutes() +' : '+ date.getSeconds();
             //console.log(time);
             if( date.getSeconds() % graphDist === 0) {
                 if(hAxisTicks.length > graphLength / graphDist) {
@@ -43,7 +44,7 @@
         var drawChart = function() {
             var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
             var data = new google.visualization.DataTable();
-            data.addColumn('timeofday', 'Time');
+            data.addColumn('string', 'Time');
             data.addColumn('number', '211');
             data.addColumn('number', '212');
             data.addColumn('number', '213');
@@ -55,11 +56,11 @@
                 return {
                     title: 'Company Performance',
                     curveType: 'function',
-                    //hAxis: { ticks: hAxisTicks },
+                    hAxis: { ticks: hAxisTicks },
                     legend: { position: 'bottom' },
                     animation:{
                         //startup: true,
-                        duration: 1500,
+                        duration: 500,
                         easing: 'linear'
                     }
                 }
@@ -74,36 +75,16 @@
                         data.addRows([dataSet]);
                         console.log(data.getNumberOfRows());
                         console.log(JSON.parse(data.toJSON()));
-                        chart.draw(data, {
-                            title: 'Company Performance',
-                            curveType: 'function',
-                            //hAxis: { ticks: hAxisTicks },
-                            legend: { position: 'bottom' },
-                            animation:{
-                                //startup: true,
-                                duration: 1500,
-                                easing: 'linear'
-                            }
-                        });
-                     }, 3000)
+                        chart.draw(data, getOptions());
+                    }, 1000)
                 });
-            chart.draw(data, {
-                title: 'Company Performance',
-                curveType: 'function',
-                //hAxis: { ticks: hAxisTicks },
-                legend: { position: 'bottom' },
-                animation:{
-                    //startup: true,
-                    duration: 1500,
-                    easing: 'linear'
-                }
-            });
+            chart.draw(data, getOptions());
         };
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart);
     </script>
 </head>
 <body>
-    <div id="curve_chart" style="height: 500px"></div>
+<div id="curve_chart" style="height: 500px"></div>
 </body>
 </html>
