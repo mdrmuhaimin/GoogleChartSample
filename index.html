@@ -20,7 +20,7 @@
                 date  = new Date(timeEpoch);
             }
             time = [date.getHours(), date.getMinutes(), date.getSeconds()];
-            if( date.getSeconds() % graphDist === 0) {
+            if( time[2] % graphDist === 0) {
                 hAxisTicks.push(time);
                 return [time, _211, _212, _213, _214, _215, _216];
             }
@@ -53,15 +53,36 @@
                     title: 'Company Performance',
                     curveType: 'function',
                     hAxis: {
-                        ticks: hAxisTicks
+                        ticks: hAxisTicks,
+                        gridlines: {color: 'white', lineWidth: 50}
                     },
-                    legend: { position: 'bottom' },
+                    legend: { position: 'none' },
                     animation:{
-                        duration: 500,
+                        duration: 990,
                         easing: 'in'
                     }
                 }
 
+            };
+            var draw = function ( data, options) {
+                var view = new google.visualization.DataView(data);
+                var documentChekced = [
+                    document.getElementById("211").checked,
+                    document.getElementById("212").checked,
+                    document.getElementById("213").checked,
+                    document.getElementById("214").checked,
+                    document.getElementById("215").checked,
+                    document.getElementById("216").checked
+                ];
+                var hiddenColumns = [];
+                for(var i = 0; i < documentChekced.length; i++) {
+                    if(!documentChekced[i]) {
+                        hiddenColumns.push(i + 1);
+                    }
+                }
+                console.log(hiddenColumns);
+                view.hideColumns(hiddenColumns);
+                chart.draw(view, getOptions());
             };
 
             google.visualization.events.addListener(chart, 'ready',
@@ -69,28 +90,53 @@
                     if(addingFlag) {
                         setTimeout(function () {
                             var dataSet = getNewDataSet();
+//                            if(dataSet[0][2] % graphDist === 0){
+//                                hAxisTicks.push(dataSet[0][2]);
+//                            }
                             data.addRow(getNewDataSet());
                             addingFlag = !addingFlag;
-                            chart.draw(data, getOptions());
+                            draw(data, getOptions());
                         },1000);
                     } else {
                         setTimeout(function () {
-                            if(data.getValue(120, 0)[2] % 15 === 0){
+                            if(data.getValue(120, 0)[2] % graphDist === 0){
                                 hAxisTicks.shift();
                             }
                             data.removeRow(0)
                             addingFlag = !addingFlag;
-                            chart.draw(data, getOptions());
-                        },1);
+                            draw(data, getOptions());
+                        },10);
                     }
                 });
-            chart.draw(data, getOptions());
+            draw(data, getOptions());
         };
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart);
     </script>
 </head>
 <body>
-<div id="curve_chart" style="height: 500px"></div>
+<div>
+    <ul>
+        <li>
+            <input type="checkbox" id="211" checked> 211
+        </li>
+        <li>
+            <input type="checkbox" id="212" checked> 212
+        </li>
+        <li>
+            <input type="checkbox" id="213" checked> 213
+        </li>
+        <li>
+            <input type="checkbox" id="214" checked> 214
+        </li>
+        <li>
+            <input type="checkbox" id="215" checked> 215
+        </li>
+        <li>
+            <input type="checkbox" id="216" checked> 216
+        </li>
+    </ul>
+</div>
+<div id="curve_chart" style="width: 900px; height: 500px"></div>
 </body>
 </html>
