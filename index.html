@@ -2,7 +2,7 @@
 <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        var graphLength = 120;
+        var graphLength = 30;
         var graphDist = 15;
         var hAxisTicks = [];
         var getNewDataSet = function (timeEpoch) {
@@ -56,12 +56,15 @@
                 return {
                     title: 'Company Performance',
                     curveType: 'function',
-                    hAxis: { ticks: hAxisTicks },
+                    hAxis: {
+                        //ticks: hAxisTicks,
+                        showTextEvery: 2
+                    },
                     legend: { position: 'bottom' },
                     animation:{
                         //startup: true,
-                        duration: 500,
-                        easing: 'linear'
+                        duration: 900,
+                        easing: 'in'
                     }
                 }
 
@@ -72,11 +75,9 @@
                     setTimeout(function () {
                         var dataSet = getNewDataSet();
                         data.removeRow(0);
-                        data.addRows([dataSet]);
-                        console.log(data.getNumberOfRows());
-                        console.log(JSON.parse(data.toJSON()));
+                        data.addRow(dataSet);
                         chart.draw(data, getOptions());
-                    }, 1000)
+                   }, 1000)
                 });
             chart.draw(data, getOptions());
         };
