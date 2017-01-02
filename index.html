@@ -19,12 +19,14 @@
             } else {
                 date  = new Date(timeEpoch);
             }
-            time = [date.getHours(), date.getMinutes(), date.getSeconds()];
-            if( time[2] % graphDist === 0) {
+            //time = [date.getHours(), date.getMinutes(), date.getSeconds()];
+            time = date.getHours()+' : '+date.getMinutes()+' : '+date.getSeconds();
+            if( date.getSeconds() % graphDist === 0) {
                 hAxisTicks.push(time);
+                console.log('hello');
                 return [time, _211, _212, _213, _214, _215, _216];
             }
-            return [time, _211, _212, _213, _214, _215, _216];
+            return ['', _211, _212, _213, _214, _215, _216];
         };
         var createDataSet = function () {
             var data = [];
@@ -40,7 +42,7 @@
             var addingFlag = true;
             var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
             var data = new google.visualization.DataTable();
-            data.addColumn('timeofday', 'Time');
+            data.addColumn('string', 'Time');
             data.addColumn('number', '211');
             data.addColumn('number', '212');
             data.addColumn('number', '213');
@@ -48,6 +50,13 @@
             data.addColumn('number', '215');
             data.addColumn('number', '216');
             data.addRows(createDataSet());
+            var options_lines = {
+                title: 'Line intervals, default',
+                curveType: 'function',
+                lineWidth: 4,
+                intervals: { 'style':'line' },
+                legend: 'none'
+            };
             var getOptions = function (){
                 return {
                     title: 'Company Performance',
@@ -82,7 +91,7 @@
                 }
                 console.log(hiddenColumns);
                 view.hideColumns(hiddenColumns);
-                chart.draw(view, getOptions());
+                chart.draw(view, options_lines);
             };
 
             google.visualization.events.addListener(chart, 'ready',
